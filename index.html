@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>GearRank | Recomendador gaming con Elo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <div class="brand"><span class="brand-icon">⚡</span> GearRank <span class="badge">DEMO ELO</span></div>
+      <p class="eyebrow">ACTIVIDAD 3.4 · DISEÑO APLICADO</p>
+      <h1>Tu voto mueve el ranking<span class="accent">.</span></h1>
+      <p class="subtitle">Compara periféricos gaming, decide cuál prefieres y descubre
+        recomendaciones según tus gustos y tu presupuesto.</p>
+      <div class="stats">
+        <span>🎮 <strong id="productCount">12</strong> productos</span>
+        <span>🗳️ <strong id="voteCount">0</strong> votos registrados</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="main-grid">
+      <section class="panel settings" aria-labelledby="headingSettings">
+        <div class="section-heading">
+          <span class="number">01</span>
+          <div><h2 id="headingSettings">Configura tus gustos</h2>
+            <p>Define cómo quieres comparar.</p></div>
+        </div>
+
+        <label for="categorySelect">Categoría preferida</label>
+        <select id="categorySelect"></select>
+
+        <label for="contextSelect">¿Qué te importa al elegir?</label>
+        <select id="contextSelect"></select>
+
+        <label for="budgetInput">Presupuesto máximo (COP)</label>
+        <input id="budgetInput" type="number" min="0" step="10000"
+               value="500000" inputmode="numeric" placeholder="Sin límite">
+        <p class="help">Deja el presupuesto vacío para ver todas las opciones.
+          El presupuesto solo filtra las recomendaciones, no modifica Elo.</p>
+
+        <div class="button-row">
+          <button id="btnNewPair" class="button secondary" type="button">↻ Nuevo duelo</button>
+          <button id="btnReset" class="button danger" type="button">Reiniciar votos</button>
+        </div>
+      </section>
+
+      <section class="panel arena" aria-labelledby="headingArena">
+        <div class="section-heading">
+          <span class="number">02</span>
+          <div><h2 id="headingArena">Duelo A/B</h2>
+            <p>Haz clic en el producto que prefieras.</p></div>
+        </div>
+        <p class="question" id="question">¿Cuál elegirías?</p>
+
+        <div class="duel">
+          <button class="product-choice" id="btnA" type="button">
+            <span class="choice-letter">A</span>
+            <span class="product-icon" id="iconA" aria-hidden="true">🖱️</span>
+            <span class="product-name" id="nameA">Producto A</span>
+            <span class="product-category" id="categoryA">Categoría</span>
+            <span class="product-detail" id="detailA">Descripción</span>
+            <span class="product-price" id="priceA">$0</span>
+            <span class="product-elo" id="ratingA">Elo contextual: 1000.0</span>
+            <span class="vote-action">Elegir A ↗</span>
+          </button>
+
+          <button class="product-choice" id="btnB" type="button">
+            <span class="choice-letter">B</span>
+            <span class="product-icon" id="iconB" aria-hidden="true">⌨️</span>
+            <span class="product-name" id="nameB">Producto B</span>
+            <span class="product-category" id="categoryB">Categoría</span>
+            <span class="product-detail" id="detailB">Descripción</span>
+            <span class="product-price" id="priceB">$0</span>
+            <span class="product-elo" id="ratingB">Elo contextual: 1000.0</span>
+            <span class="vote-action">Elegir B ↗</span>
+          </button>
+        </div>
+        <p class="feedback" id="voteFeedback" role="status" aria-live="polite">
+          Ambos productos empiezan con 1.000 puntos Elo.
+        </p>
+      </section>
+    </div>
+
+    <div class="results-grid">
+      <section class="panel" aria-labelledby="headingRanking">
+        <div class="section-heading">
+          <span class="number">03</span>
+          <div><h2 id="headingRanking">Ranking general</h2>
+            <p>Los 12 productos ordenados por Elo de todos los votos.</p></div>
+        </div>
+        <div class="ranking-list" id="topBox" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="headingRecommendations">
+        <div class="section-heading">
+          <span class="number">04</span>
+          <div><h2 id="headingRecommendations">Para ti ✨</h2>
+            <p>Recomendaciones por categoría, presupuesto y criterio.</p></div>
+        </div>
+        <p class="filter-summary" id="filterSummary"></p>
+        <div class="ranking-list" id="recommendationBox" aria-live="polite"></div>
+        <p class="help">Orden: Elo contextual; si hay empate, Elo general y luego menor precio.
+          Un empate inicial no significa que los productos sean iguales.</p>
+      </section>
+    </div>
+
+    <section class="panel catalog-section" aria-labelledby="headingCatalog">
+      <div class="section-heading">
+        <span class="number">05</span>
+        <div><h2 id="headingCatalog">Catálogo de GearRank</h2>
+          <p>12 productos de ejemplo · Valores ilustrativos en COP.</p></div>
+      </div>
+      <div class="catalog-grid" id="catalogBox"></div>
+    </section>
+
+    <section class="info-strip" aria-label="Información del algoritmo">
+      <div>
+        <h2>¿Cómo funciona Elo?</h2>
+        <p>Todos comienzan en 1.000 puntos. Con <strong>K = 32</strong>, cada voto
+          aumenta el Elo del elegido y reduce el del otro según sus puntuaciones previas.</p>
+        <p>Los votos son preferencias humanas; el ranking no mide calidad objetiva.</p>
+      </div>
+      <button id="btnExport" class="button primary" type="button">↓ Exportar votos CSV</button>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    GearRank · Adaptación educativa de CourseMash · HTML, CSS y JavaScript sin librerías.
+    No procesa compras reales. Los datos quedan guardados en este navegador cuando es posible.
+  </footer>
+</body>
+</html>
